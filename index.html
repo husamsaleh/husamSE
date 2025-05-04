@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Husam Saleh | Full Stack Developer</title>
+  <meta name="description" content="Full Stack Developer specializing in creating amazing web experiences">
+  
+  <!-- Preconnect to external resources -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Preload critical CSS -->
+  <link rel="preload" href="./src/css/style.css" as="style">
+  <link rel="stylesheet" href="./src/css/style.css">
+  
+  <!-- Font loading optimization -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Prevent FOIT (Flash of Invisible Text) -->
+  <style>
+    .font-loaded body {
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div class="loading-screen">
+    <div class="loading-content">
+      <h1>HUSAM SALEH</h1>
+      <div class="loading-container">
+        <div class="loading-bar-container">
+          <div class="loading-bar"></div>
+        </div>
+        <div class="loading-progress">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WebGL Canvas -->
+  <canvas class="webgl"></canvas>
+  
+  <!-- Side Menu -->
+  <div class="side-menu">
+    <div class="menu-item active" data-index="0">
+      <div class="menu-line"></div>
+      <div class="menu-text">Home</div>
+    </div>
+    <div class="menu-item" data-index="1">
+      <div class="menu-line"></div>
+      <div class="menu-text">Who I Am</div>
+    </div>
+    <div class="menu-item" data-index="2">
+      <div class="menu-line"></div>
+      <div class="menu-text">My Expertise</div>
+    </div>
+    <div class="menu-item" data-index="3">
+      <div class="menu-line"></div>
+      <div class="menu-text">My Approach</div>
+    </div>
+    <div class="menu-item" data-index="4">
+      <div class="menu-line"></div>
+      <div class="menu-text">My Content</div>
+    </div>
+    <div class="menu-item" data-index="5">
+      <div class="menu-line"></div>
+      <div class="menu-text">Projects</div>
+    </div>
+    <div class="menu-item" data-index="6">
+      <div class="menu-line"></div>
+      <div class="menu-text">Contact</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="scroll-container">
+    <!-- Hero Section -->
+    <section class="panel hero-section">
+      <main>
+        <header>
+          <div class="logo">HS</div>
+        </header>
+
+        <section class="hero">
+          <div class="container">
+            <h1 class="title">Husam Saleh</h1>
+            <h2 class="subtitle">Full Stack Developer</h2>
+            <p class="description">Building amazing web experiences</p>
+            <div class="cta">
+              <a href="javascript:void(0);" data-scroll="5" class="btn primary">View My Work</a>
+              <a href="javascript:void(0);" data-scroll="6" class="btn secondary">Get In Touch</a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <!-- Who I Am Section -->
+    <section id="who-i-am" class="panel about-section">
+      <div class="container">
+        <h2 class="section-title">Who I Am</h2>
+        <div class="content-wrapper">
+          <div class="content-block">
+            <div class="about-image-container">
+              <img src="./images/husamsaleh.png" alt="Husam Saleh" class="about-image">
+            </div>
+            <div class="about-text">
+              <p>I'm a passionate Full Stack Developer with a keen eye for design and a love for creating seamless user experiences. With a background in both front-end and back-end development, I bring a holistic approach to every project I tackle.</p>
+              <p>Based in San Francisco, I've worked with startups and established companies alike, helping them build digital products that users love. When I'm not coding, you'll find me exploring new technologies, contributing to open source, or sharing my knowledge through my content creation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Expertise Section -->
+    <section id="my-expertise" class="panel expertise-section">
+      <div class="container">
+        <h2 class="section-title">My Expertise</h2>
+        <div class="content-wrapper">
+          <div class="content-block">
+            <ul class="skills-list">
+              <li>
+                <span class="skill-title">Frontend Development</span>
+                <span class="skill-details">React, Vue, Angular, Three.js</span>
+              </li>
+              <li>
+                <span class="skill-title">Backend Development</span>
+                <span class="skill-details">Node.js, Python, PHP, Express</span>
+              </li>
+              <li>
+                <span class="skill-title">Database Design</span>
+                <span class="skill-details">SQL, NoSQL, MongoDB, PostgreSQL</span>
+              </li>
+              <li>
+                <span class="skill-title">UI/UX Design</span>
+                <span class="skill-details">Figma, Adobe XD, Responsive Design</span>
+              </li>
+              <li>
+                <span class="skill-title">Creative Development</span>
+                <span class="skill-details">WebGL, GSAP, Canvas, SVG Animations</span>
+              </li>
+              <li>
+                <span class="skill-title">DevOps</span>
+                <span class="skill-details">CI/CD, Docker, AWS, Netlify</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Approach Section -->
+    <section id="my-approach" class="panel approach-section">
+      <div class="container">
+        <h2 class="section-title">My Approach</h2>
+        <div class="content-wrapper">
+          <div class="content-block">
+            <p>I believe in creating websites that are not just functional but also delightful to use. By combining clean code with creative design, I craft digital experiences that help businesses stand out and engage their users effectively.</p>
+            <div class="approach-principles">
+              <div class="principle">
+                <div class="principle-icon">🎯</div>
+                <h3>User-Focused Design</h3>
+                <p>I put users at the center of every decision, ensuring intuitive and accessible experiences.</p>
+              </div>
+              <div class="principle">
+                <div class="principle-icon">⚡</div>
+                <h3>Performance First</h3>
+                <p>Fast-loading websites are critical for user retention and SEO. I optimize for speed from day one.</p>
+              </div>
+              <div class="principle">
+                <div class="principle-icon">🔄</div>
+                <h3>Iterative Process</h3>
+                <p>I believe in constant improvement through feedback and data-driven decisions.</p>
+              </div>
+              <div class="principle">
+                <div class="principle-icon">🛠️</div>
+                <h3>Maintainable Code</h3>
+                <p>I write clean, well-documented code that's easy to maintain and extend over time.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Content Section -->
+    <section id="my-content" class="panel content-section">
+      <div class="container">
+        <h2 class="section-title">My Content</h2>
+        <div class="content-wrapper">
+          <div class="content-block">
+            <div class="instagram-info">
+              <img src="./images/husam2.jpg" alt="Husam Saleh Instagram" class="instagram-profile">
+              <div class="instagram-stats">
+                <h3>16K+ Instagram Followers</h3>
+                <p>I share web development tips, code snippets, and behind-the-scenes looks at my projects with a growing community of developers and tech enthusiasts.</p>
+                <div class="content-topics">
+                  <span class="topic">JavaScript Tips</span>
+                  <span class="topic">CSS Tricks</span>
+                  <span class="topic">Web Animation</span>
+                  <span class="topic">Three.js</span>
+                  <span class="topic">Career Advice</span>
+                </div>
+                <a href="https://instagram.com/husamsaleh" target="_blank" class="btn primary">Follow Me @husamsaleh</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="panel projects-section">
+      <div class="container">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="projects-grid">
+          <div class="project-card">
+            <div class="project-image" data-src="./images/dexcubeshop.png"></div>
+            <div class="project-details">
+              <h3>E-Commerce Platform</h3>
+              <p>A full-featured online store with payment processing, inventory management, and analytics dashboard.</p>
+              <div class="project-tech">React • Node.js • MongoDB • Stripe</div>
+              <a href="#" class="project-link">View Project</a>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <div class="project-image" data-src="./images/screwhardware.png"></div>
+            <div class="project-details">
+              <h3>Healthcare Dashboard</h3>
+              <p>Interactive analytics platform for healthcare providers with real-time data visualization.</p>
+              <div class="project-tech">Vue.js • Express • PostgreSQL • D3.js</div>
+              <a href="#" class="project-link">View Project</a>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <div class="project-image" data-src="./images/lightness.png"></div>
+            <div class="project-details">
+              <h3>Social Media App</h3>
+              <p>Mobile-first social platform with real-time messaging and content sharing capabilities.</p>
+              <div class="project-tech">React Native • Firebase • WebRTC</div>
+              <a href="#" class="project-link">View Project</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="panel contact-section">
+      <div class="container">
+        <h2 class="section-title">Get In Touch</h2>
+        <div class="contact-content">
+          <div class="contact-info">
+            <h3>Let's work together</h3>
+            <p>Have a project in mind? I'd love to hear about it. Drop me a message and let's create something amazing together.</p>
+            <div class="contact-links">
+              <a href="mailto:hello@husamsaleh.com" class="contact-link">hello@husamsaleh.com</a>
+              <a href="tel:+1234567890" class="contact-link">+123 456 7890</a>
+            </div>
+            <div class="social-links">
+              <a href="#" class="social-icon">LinkedIn</a>
+              <a href="#" class="social-icon">GitHub</a>
+              <a href="#" class="social-icon">Instagram</a>
+            </div>
+          </div>
+          <form class="contact-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn primary">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scroll Guide -->
+    <div class="scroll-guide">
+      <div class="scroll-dot active" data-index="0"></div>
+      <div class="scroll-dot" data-index="1"></div>
+      <div class="scroll-dot" data-index="2"></div>
+      <div class="scroll-dot" data-index="3"></div>
+      <div class="scroll-dot" data-index="4"></div>
+      <div class="scroll-dot" data-index="5"></div>
+      <div class="scroll-dot" data-index="6"></div>
+    </div>
+  </div>
+
+  <!-- Font loading script to avoid FOIT -->
+  <script>
+    if ('fonts' in document) {
+      Promise.all([
+        document.fonts.load('300 1em Inter'),
+        document.fonts.load('400 1em Inter'),
+        document.fonts.load('500 1em Inter'),
+        document.fonts.load('700 1em Inter'),
+        document.fonts.load('900 1em Inter')
+      ]).then(() => {
+        document.documentElement.classList.add('font-loaded');
+      });
+    }
+  </script>
+  
+  <!-- Main script with module type for better loading -->
+  <script type="module" src="./src/js/main.js"></script>
+</body>
+</html> 

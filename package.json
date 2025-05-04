@@ -1,0 +1,30 @@
+{
+  "name": "husamse",
+  "version": "1.0.0",
+  "description": "A breathtaking Three.js-powered landing page for a full stack developer portfolio.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/husamsaleh/husamSE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/husamsaleh/husamSE/issues"
+  },
+  "homepage": "https://github.com/husamsaleh/husamSE#readme",
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "three": "^0.161.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.12"
+  }
+}
