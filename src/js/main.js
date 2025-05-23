@@ -218,25 +218,8 @@ function createLoadingParticles() {
 
 // Disable default scrolling on wheel events to implement custom scrolling
 scrollContainer.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  
-  if (isScrolling) return;
-  
-  // Determine scroll direction
-  const delta = e.deltaY;
-  const direction = delta > 0 ? 1 : -1;
-  
-  // Get current section
-  const currentPos = Math.round(scrollContainer.scrollTop / window.innerHeight);
-  
-  // Calculate next section with boundary checks
-  const nextSection = Math.max(0, Math.min(panels.length - 1, currentPos + direction));
-  
-  // Only scroll if it's a different section
-  if (nextSection !== currentPos) {
-    scrollToSection(nextSection);
-  }
-}, { passive: false });
+  // Allow default scrolling behavior
+}, { passive: true });
 
 // Global variables to track scroll state
 let isScrolling = false;
@@ -250,8 +233,11 @@ function scrollToSection(sectionIndex) {
   // Update current section
   currentSection = sectionIndex;
   
-  // Calculate target scroll position
-  const targetPosition = sectionIndex * window.innerHeight;
+  // Get the target element
+  const targetElement = panels[sectionIndex];
+  
+  // Calculate target scroll position - get the element's position
+  const targetPosition = targetElement.offsetTop;
   
   // Animate the scroll
   gsap.to(scrollContainer, {
@@ -261,9 +247,6 @@ function scrollToSection(sectionIndex) {
     onComplete: () => {
       // Update navigation
       updateActiveNavigation();
-      
-      // Update 3D scene
-      updateSceneForSection(sectionIndex);
       
       // Wait a bit before allowing another scroll
       setTimeout(() => {
@@ -319,30 +302,11 @@ let touchEndY = 0;
 const minSwipeDistance = 50;
 
 scrollContainer.addEventListener('touchstart', (e) => {
-  touchStartY = e.changedTouches[0].screenY;
+  // Allow default touch behavior
 }, { passive: true });
 
 scrollContainer.addEventListener('touchend', (e) => {
-  if (isScrolling) return;
-  
-  touchEndY = e.changedTouches[0].screenY;
-  
-  // Calculate distance
-  const distance = touchStartY - touchEndY;
-  
-  // Check if the swipe is long enough
-  if (Math.abs(distance) < minSwipeDistance) return;
-  
-  // Determine direction
-  const direction = distance > 0 ? 1 : -1;
-  
-  // Calculate next section with boundary checks
-  const nextSection = Math.max(0, Math.min(panels.length - 1, currentSection + direction));
-  
-  // Only scroll if it's a different section
-  if (nextSection !== currentSection) {
-    scrollToSection(nextSection);
-  }
+  // Allow default touch behavior
 }, { passive: true });
 
 // Handle page visibility to save resources
@@ -409,7 +373,7 @@ composer.addPass(bloomPass);
 
 // Particles
 const particlesGeometry = new THREE.BufferGeometry();
-const particlesCount = 3000;
+const particlesCount = 5000;
 
 const posArray = new Float32Array(particlesCount * 3);
 const scaleArray = new Float32Array(particlesCount);
@@ -453,10 +417,10 @@ const particlesMaterial = new THREE.ShaderMaterial({
       float dist = length(position);
       float scaleBasedOnDistance = 1.0 - dist / 5.0;
       
-      // Final size
+      // Final size - INCREASED SIZE HERE
       vec4 viewPosition = viewMatrix * modelPosition;
       gl_Position = projectionMatrix * viewPosition;
-      gl_PointSize = (scale * 10.0 + 1.0) * scaleBasedOnDistance * 
+      gl_PointSize = (scale * 15.0 + 2.0) * scaleBasedOnDistance * 
                     (1000.0 / -viewPosition.z);
     }
   `,
@@ -486,17 +450,6 @@ const particlesMaterial = new THREE.ShaderMaterial({
 
 const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 scene.add(particles);
-
-// Torus Knot
-const torusKnotGeometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
-const torusKnotMaterial = new THREE.MeshBasicMaterial({
-  color: 0xff3366,
-  transparent: true,
-  opacity: 0.2,
-  wireframe: true
-});
-const torusKnot = new THREE.Mesh(torusKnotGeometry, torusKnotMaterial);
-scene.add(torusKnot);
 
 // Flying objects
 const flyingObjects = [];
@@ -592,30 +545,26 @@ const tick = () => {
 
   // Update controls
   controls.update();
-
-  // Rotate torus knot
-  torusKnot.rotation.x = elapsedTime * 0.3;
-  torusKnot.rotation.y = elapsedTime * 0.2;
   
-  // Update particles
-  particles.rotation.y = elapsedTime * 0.05;
-  particles.rotation.x = elapsedTime * 0.03;
+  // Update particles with smooth rotation
+  particles.rotation.y = elapsedTime * 0.03;
+  particles.rotation.x = elapsedTime * 0.02;
   
   // Update flying objects
   flyingObjects.forEach((object) => {
     // Rotate around random axis
-    object.rotateOnAxis(object.userData.randomAxis, 0.01);
+    object.rotateOnAxis(object.userData.randomAxis, 0.005);
     
     // Subtle floating animation
     const originalPos = object.userData.originalPosition;
-    object.position.x = originalPos.x + Math.sin(elapsedTime * 0.5 + object.position.z) * 0.3;
-    object.position.y = originalPos.y + Math.cos(elapsedTime * 0.5 + object.position.x) * 0.3;
-    object.position.z = originalPos.z + Math.sin(elapsedTime * 0.3 + object.position.y) * 0.3;
+    object.position.x = originalPos.x + Math.sin(elapsedTime * 0.3 + object.position.z) * 0.3;
+    object.position.y = originalPos.y + Math.cos(elapsedTime * 0.3 + object.position.x) * 0.3;
+    object.position.z = originalPos.z + Math.sin(elapsedTime * 0.2 + object.position.y) * 0.3;
   });
   
-  // Mouse interaction
-  particles.rotation.x += mouse.y * 0.01;
-  particles.rotation.y += mouse.x * 0.01;
+  // Mouse interaction - more subtle
+  particles.rotation.x += mouse.y * 0.003;
+  particles.rotation.y += mouse.x * 0.003;
   
   // Render
   composer.render();
@@ -717,14 +666,19 @@ let lastScrollTop = 0;
 let scrollTimeout = null;
 let scrollAnimationInProgress = false;
 
-// Scroll-triggered animations for content sections
+// Configure ScrollTrigger for smooth scrolling
 function setupScrollAnimations() {
+  // Configure ScrollTrigger defaults
+  ScrollTrigger.defaults({
+    scroller: '.scroll-container',
+    toggleActions: 'play none none reverse'
+  });
+  
   // Who I Am section animations
   gsap.from('#who-i-am .section-title', {
     scrollTrigger: {
       trigger: '#who-i-am',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -734,8 +688,7 @@ function setupScrollAnimations() {
   gsap.from('#who-i-am .about-image-container', {
     scrollTrigger: {
       trigger: '#who-i-am',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 50,
     opacity: 0,
@@ -745,8 +698,7 @@ function setupScrollAnimations() {
   gsap.from('#who-i-am .about-text', {
     scrollTrigger: {
       trigger: '#who-i-am',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 50,
     opacity: 0,
@@ -758,8 +710,7 @@ function setupScrollAnimations() {
   gsap.from('#my-expertise .section-title', {
     scrollTrigger: {
       trigger: '#my-expertise',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -769,8 +720,7 @@ function setupScrollAnimations() {
   gsap.from('#my-expertise .skills-list li', {
     scrollTrigger: {
       trigger: '#my-expertise',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 50,
     opacity: 0,
@@ -782,8 +732,7 @@ function setupScrollAnimations() {
   gsap.from('#my-approach .section-title', {
     scrollTrigger: {
       trigger: '#my-approach',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -793,8 +742,7 @@ function setupScrollAnimations() {
   gsap.from('#my-approach .content-block > p', {
     scrollTrigger: {
       trigger: '#my-approach',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 30,
     opacity: 0,
@@ -804,8 +752,7 @@ function setupScrollAnimations() {
   gsap.from('#my-approach .principle', {
     scrollTrigger: {
       trigger: '#my-approach .principle',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -817,8 +764,7 @@ function setupScrollAnimations() {
   gsap.from('#my-content .section-title', {
     scrollTrigger: {
       trigger: '#my-content',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -828,8 +774,7 @@ function setupScrollAnimations() {
   gsap.from('#my-content .instagram-profile', {
     scrollTrigger: {
       trigger: '#my-content',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     scale: 0.8,
     opacity: 0,
@@ -840,8 +785,7 @@ function setupScrollAnimations() {
   gsap.from('#my-content .instagram-stats', {
     scrollTrigger: {
       trigger: '#my-content',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     x: 30,
     opacity: 0,
@@ -853,8 +797,7 @@ function setupScrollAnimations() {
   gsap.from('#projects .section-title', {
     scrollTrigger: {
       trigger: '#projects',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -864,8 +807,7 @@ function setupScrollAnimations() {
   gsap.from('#projects .project-card', {
     scrollTrigger: {
       trigger: '#projects',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 100,
     opacity: 0,
@@ -877,8 +819,7 @@ function setupScrollAnimations() {
   gsap.from('#contact .section-title', {
     scrollTrigger: {
       trigger: '#contact',
-      start: 'top 80%',
-      scroller: '.scroll-container'
+      start: 'top 80%'
     },
     y: 50,
     opacity: 0,
@@ -888,8 +829,7 @@ function setupScrollAnimations() {
   gsap.from('#contact .contact-form', {
     scrollTrigger: {
       trigger: '#contact',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 50,
     opacity: 0,
@@ -899,8 +839,7 @@ function setupScrollAnimations() {
   gsap.from('#contact .contact-info', {
     scrollTrigger: {
       trigger: '#contact',
-      start: 'top 70%',
-      scroller: '.scroll-container'
+      start: 'top 70%'
     },
     y: 50,
     opacity: 0,
@@ -974,16 +913,6 @@ function startIntroAnimation() {
     ease: 'power2.out'
   });
   
-  // Animate torus knot
-  gsap.from(torusKnot.scale, {
-    x: 0,
-    y: 0,
-    z: 0,
-    duration: 1.5,
-    ease: 'back.out(1.7)',
-    delay: 0.5
-  });
-  
   // Animate flying objects - they already have scale 0 from initialization
   flyingObjects.forEach((object, i) => {
     gsap.to(object.scale, {
@@ -1001,6 +930,9 @@ function startIntroAnimation() {
   
   // Run optimizations after animations complete
   setupPageOptimizations();
+  
+  // Set up consistent background
+  updateSceneForSection(0);
   
   // Initialize to correct section if page was loaded at a scroll position
   setTimeout(() => {
@@ -1070,10 +1002,46 @@ const loadingInterval = setInterval(() => {
 // Initialize active state for navigation
 updateActiveNavigation();
 
+// After the page loads and all content is rendered, update active section again
+window.addEventListener('load', () => {
+  // Force recalculation after all assets are loaded
+  setTimeout(() => {
+    updateActiveNavigation();
+  }, 500);
+});
+
 // Update active dot and menu item based on scroll position
 function updateActiveNavigation() {
-  const currentSection = Math.round(scrollContainer.scrollTop / window.innerHeight);
+  const scrollPosition = scrollContainer.scrollTop;
+  const windowHeight = window.innerHeight;
   
+  // Find which section is currently most visible
+  let maxVisibleSection = 0;
+  let maxVisibleAmount = 0;
+  
+  panels.forEach((panel, index) => {
+    const panelTop = panel.offsetTop;
+    const panelHeight = panel.offsetHeight;
+    const panelBottom = panelTop + panelHeight;
+    
+    // Calculate how much of the panel is visible
+    const visibleTop = Math.max(scrollPosition, panelTop);
+    const visibleBottom = Math.min(scrollPosition + windowHeight, panelBottom);
+    const visibleAmount = Math.max(0, visibleBottom - visibleTop);
+    
+    // Calculate visibility ratio (visible amount / possible visible amount)
+    const visibilityRatio = visibleAmount / Math.min(panelHeight, windowHeight);
+    
+    if (visibleAmount > maxVisibleAmount) {
+      maxVisibleAmount = visibleAmount;
+      maxVisibleSection = index;
+    }
+  });
+  
+  // Update current section
+  currentSection = maxVisibleSection;
+  
+  // Update UI
   scrollDots.forEach((dot, index) => {
     if (index === currentSection) {
       dot.classList.add('active');
@@ -1093,160 +1061,61 @@ function updateActiveNavigation() {
 
 // Update scene elements based on current section
 function updateSceneForSection(sectionIndex) {
-  // Cancel any running animations
-  gsap.killTweensOf(camera.position);
-  gsap.killTweensOf(particles.rotation);
-  gsap.killTweensOf(torusKnot.rotation);
-  flyingObjects.forEach(object => {
-    gsap.killTweensOf(object.position);
+  // Simple version that doesn't change much with scroll
+  // Set a consistent, static background
+  
+  // Position camera consistently
+  gsap.to(camera.position, {
+    duration: 1.5,
+    ease: 'power2.inOut',
+    x: 0,
+    y: 0,
+    z: 5
   });
   
-  // Different camera positions and animations based on section
-  switch(sectionIndex) {
-    case 0: // Home
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: 0,
-        y: 0,
-        z: 4
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: 0,
-        y: 0
-      });
-      break;
-      
-    case 1: // Who I Am
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(1) * 2,
-        y: 0.5,
-        z: 4 + Math.sin(1 * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(1 * Math.PI) * 0.5,
-        y: Math.cos(1 * Math.PI) * 0.5
-      });
-      break;
-      
-    case 2: // My Expertise
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(2) * 2,
-        y: -0.5,
-        z: 4 + Math.sin(2 * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(2 * Math.PI) * 0.5,
-        y: Math.cos(2 * Math.PI) * 0.5
-      });
-      break;
-      
-    case 3: // My Approach
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(3) * 2,
-        y: 0.3,
-        z: 4 + Math.sin(3 * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(3 * Math.PI) * 0.5,
-        y: Math.cos(3 * Math.PI) * 0.5
-      });
-      break;
-      
-    case 4: // My Content
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(4) * 2,
-        y: -0.3,
-        z: 4 + Math.sin(4 * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(4 * Math.PI) * 0.5,
-        y: Math.cos(4 * Math.PI) * 0.5
-      });
-      break;
-      
-    case 5: // Projects
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(5) * 2,
-        y: 0.2,
-        z: 4 + Math.sin(5 * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(5 * Math.PI) * 0.5,
-        y: Math.cos(5 * Math.PI) * 0.5
-      });
-      break;
-      
-    case 6: // Contact
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(6) * 2,
-        y: -0.2,
-        z: 4 + Math.sin(6 * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(6 * Math.PI) * 0.5,
-        y: Math.cos(6 * Math.PI) * 0.5
-      });
-      break;
-      
-    default:
-      gsap.to(camera.position, {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(sectionIndex) * 2,
-        z: 4 + Math.sin(sectionIndex * Math.PI) * 2
-      });
-      
-      gsap.to([particles.rotation, torusKnot.rotation], {
-        duration: 1.5,
-        ease: 'power2.inOut',
-        x: Math.sin(sectionIndex * Math.PI) * 0.5,
-        y: Math.cos(sectionIndex * Math.PI) * 0.5
-      });
-  }
+  // Maintain subtle particle rotation
+  gsap.to([particles.rotation], {
+    duration: 1.5,
+    ease: 'power2.inOut',
+    x: 0,
+    y: 0
+  });
   
-  // Fly in objects from outside
+  // Fly in objects from outside - simplified for consistency
   flyingObjects.forEach((object, i) => {
     gsap.to(object.position, {
       duration: 1 + Math.random() * 0.5,
       ease: 'power2.out',
-      x: Math.sin(sectionIndex + i) * 3,
-      y: Math.cos(sectionIndex + i) * 3,
-      z: Math.sin(sectionIndex * i) * 2,
+      x: Math.sin(i) * 3,
+      y: Math.cos(i) * 3,
+      z: Math.sin(i) * 2,
       delay: i * 0.05
     });
   });
-} 
+}
+
+// Add scroll event listener to update navigation
+scrollContainer.addEventListener('scroll', debounce(() => {
+  updateActiveNavigation();
+  
+  // Removed scene updates on scroll to keep background consistent
+}, 100), { passive: true });
+
+// Handle keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (isScrolling) return;
+  
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+    e.preventDefault();
+    const nextSection = Math.min(panels.length - 1, currentSection + 1);
+    if (nextSection !== currentSection) {
+      scrollToSection(nextSection);
+    }
+  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault();
+    const prevSection = Math.max(0, currentSection - 1);
+    if (prevSection !== currentSection) {
+      scrollToSection(prevSection);
+    }
+  }
+}); 
