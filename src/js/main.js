@@ -13,7 +13,9 @@ gsap.registerPlugin(ScrollTrigger);
 // Loading screen elements
 const loadingScreen = document.querySelector('.loading-screen');
 const loadingBar = document.querySelector('.loading-bar');
-const loadingProgress = document.querySelector('.loading-progress');
+const loadingBarGlow = document.querySelector('.loading-bar-glow');
+const loadingCounter = document.querySelector('.loading-counter');
+const loadingStatus = document.querySelector('.loading-status');
 
 // Scroll dots functionality
 const scrollDots = document.querySelectorAll('.scroll-dot');
@@ -27,7 +29,12 @@ const loadingManager = new THREE.LoadingManager(
   () => {
     // Show completion animation
     loadingBar.style.transform = 'scaleX(1)';
-    loadingProgress.textContent = '100%';
+    loadingBarGlow.style.transform = 'scaleX(1)';
+    loadingCounter.textContent = '100';
+    loadingStatus.textContent = 'Ready!';
+    
+    // Create particle effects along the loading bar
+    createLoadingBarParticles();
     
     // Animate loading screen away
     setTimeout(() => {
@@ -39,7 +46,7 @@ const loadingManager = new THREE.LoadingManager(
         ease: 'power2.out'
       });
       
-      // Animate loading bar
+      // Animate loading bar and counter
       gsap.to('.loading-container', {
         y: -30,
         opacity: 0,
@@ -66,10 +73,103 @@ const loadingManager = new THREE.LoadingManager(
   // Progress
   (itemUrl, itemsLoaded, itemsTotal) => {
     const progressRatio = itemsLoaded / itemsTotal;
+    const progressPercent = Math.floor(progressRatio * 100);
+    
+    // Update loading bar
     loadingBar.style.transform = `scaleX(${progressRatio})`;
-    loadingProgress.textContent = `${Math.floor(progressRatio * 100)}%`;
+    loadingBarGlow.style.transform = `scaleX(${progressRatio})`;
+    
+    // Animate counter
+    animateCounter(progressPercent);
+    
+    // Update loading status messages
+    updateLoadingStatus(progressPercent, itemUrl);
   }
 );
+
+// Animate counter with smooth transition
+let currentCounterValue = 0;
+function animateCounter(targetValue) {
+  gsap.to({ value: currentCounterValue }, {
+    value: targetValue,
+    duration: 0.5,
+    ease: 'power2.out',
+    onUpdate: function() {
+      currentCounterValue = Math.floor(this.targets()[0].value);
+      loadingCounter.textContent = currentCounterValue;
+    }
+  });
+}
+
+// Update loading status with dynamic messages
+function updateLoadingStatus(progress, itemUrl) {
+  let statusText = 'Initializing...';
+  
+  if (progress > 0 && progress <= 20) {
+    statusText = 'Loading assets...';
+  } else if (progress > 20 && progress <= 40) {
+    statusText = 'Preparing environment...';
+  } else if (progress > 40 && progress <= 60) {
+    statusText = 'Building experience...';
+  } else if (progress > 60 && progress <= 80) {
+    statusText = 'Almost there...';
+  } else if (progress > 80 && progress < 100) {
+    statusText = 'Finalizing...';
+  } else if (progress === 100) {
+    statusText = 'Ready!';
+  }
+  
+  loadingStatus.textContent = statusText;
+}
+
+// Create particles along the loading bar
+function createLoadingBarParticles() {
+  const particlesContainer = document.querySelector('.loading-bar-particles');
+  
+  // Clear existing particles
+  particlesContainer.innerHTML = '';
+  
+  // Create new particles
+  for (let i = 0; i < 15; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'loading-particle';
+    
+    // Random position along the bar
+    const xPos = Math.random() * 100;
+    const yOffset = (Math.random() - 0.5) * 20;
+    
+    // Random size
+    const size = Math.random() * 6 + 2;
+    
+    // Apply styles
+    particle.style.cssText = `
+      position: absolute;
+      left: ${xPos}%;
+      top: 50%;
+      width: ${size}px;
+      height: ${size}px;
+      background: white;
+      border-radius: 50%;
+      filter: blur(1px);
+      transform: translate(-50%, -50%) translateY(${yOffset}px);
+      opacity: 0;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    `;
+    
+    particlesContainer.appendChild(particle);
+    
+    // Animate particle
+    gsap.to(particle, {
+      opacity: Math.random() * 0.8 + 0.2,
+      y: (Math.random() - 0.5) * 30,
+      duration: Math.random() * 1.5 + 0.5,
+      delay: Math.random() * 0.5,
+      repeat: -1,
+      yoyo: true,
+      ease: 'power1.inOut'
+    });
+  }
+}
 
 // Create cool particle effect for loading transition
 function createLoadingParticles() {
@@ -94,9 +194,6 @@ function createLoadingParticles() {
     particle.style.top = `${y}px`;
     particle.style.width = `${size}px`;
     particle.style.height = `${size}px`;
-    
-    // Random animation delay
-    particle.style.animationDelay = `${Math.random() * 1.5}s`;
     
     container.appendChild(particle);
     
@@ -934,7 +1031,7 @@ const loadingInterval = setInterval(() => {
         ease: 'power2.out'
       });
       
-      // Animate loading bar
+      // Animate loading bar and counter
       gsap.to('.loading-container', {
         y: -30,
         opacity: 0,
@@ -959,8 +1056,15 @@ const loadingInterval = setInterval(() => {
     }, 500);
   }
   
+  // Update loading bar
   loadingBar.style.transform = `scaleX(${progress / 100})`;
-  loadingProgress.textContent = `${Math.floor(progress)}%`;
+  loadingBarGlow.style.transform = `scaleX(${progress / 100})`;
+  
+  // Animate counter
+  animateCounter(Math.floor(progress));
+  
+  // Update loading status
+  updateLoadingStatus(Math.floor(progress));
 }, 200);
 
 // Initialize active state for navigation
